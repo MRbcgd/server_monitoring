@@ -56,7 +56,7 @@ module.exports.stat_info = function (data1,data2) {//system information ##direct
   for(var key in data2) result[key] = data2[key];
 
   result.platform = os.platform();
-  result.kernel = 'i dnt knw.';
+  result.kernel = os.platform() + ' release ' + os.relase();
   result.hostname = os.hostname();
   result.ip = ip.address();
 
