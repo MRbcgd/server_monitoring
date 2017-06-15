@@ -1,9 +1,12 @@
 var ip = require('ip');
-var JsonSocket = require('json-socket');
 var os = require('os');
 var fs = require('fs');
+var conn = require('./db.js');
+var session = require('express-session');
+var JsonSocket = require('json-socket');
 
-const local_ip = '192.168.20.128';
+// const local_ip = '192.168.20.128';
+const local_ip = ip.address();//for test
 
 module.exports.ip_chk = function (ip_addr) {//check local ip
   console.log(ip_addr);
@@ -11,10 +14,10 @@ module.exports.ip_chk = function (ip_addr) {//check local ip
   if ( ip_addr === local_ip ) return true;
   else return false;
 };
-module.exports.cpu_info = function () {//system info
+module.exports.cpu_info = function () {//get cpu resource
   var cpuinfo = require('proc-cpuinfo')();
   var result = {};
-  
+
   result.model_name = cpuinfo.model_name.join(' ');
   result.cpu_MHz = cpuinfo.cpu_MHz[0];
   result.cache_size = cpuinfo.cache_size.join(' ');
@@ -24,7 +27,7 @@ module.exports.cpu_info = function () {//system info
 
   return result;
 };
-module.exports.mem_info = function () {
+module.exports.mem_info = function () {//get memory resource
   var info = {};
   var result = {};
   var data = fs.readFileSync('/proc/meminfo').toString();
@@ -46,7 +49,7 @@ module.exports.mem_info = function () {
 
   return result;
 };
-module.exports.stat_info = function (data1,data2) {
+module.exports.stat_info = function (data1,data2) {//system information ##direct-query
   var result = {};
 
   for(var key in data1) result[key] = data1[key];
@@ -58,4 +61,34 @@ module.exports.stat_info = function (data1,data2) {
   result.ip = ip.address();
 
   return result;
+};
+module.exports.usage_disk = function () {//get disk usage ##db-query
+  var df = require('df');
+
+  df(function (err, table) {
+    if (err) {
+      console.error(err.stack);
+      return;
+    }
+
+    var mount, total, us = 0;
+
+    for (var i = 0; i < table.length; i++) {//top usage
+      if ( us < table[i].percent ) {
+        mount = table[i].mountpoint;
+        total = table[i].available;
+        us = table[i].percent;
+      };
+    };
+
+    //command df -> this attribute 'used' is use(%).
+    // var sql = 'INSERT INTO AgentInfo(idAgentDisk, AgentInfo_svrkey, idate, mount, total, used) VALUES (?,?,?,?,?,?);';
+    //
+    // conn query(sql, function (err, results))
+    //
+    // return us;
+  });
+};
+module.exports.stat_disk = function () {//disk status ##direct-query
+
 };

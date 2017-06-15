@@ -10,7 +10,9 @@
   "license": "ISC",
   "dependencies": {
     "cpuinfo": "^0.1.0",
+    "df": "^1.1.1",
     "express": "^4.15.3",
+    "express-session": "^1.15.3",
     "ip": "^1.1.5",
     "json-socket": "^0.3.0",
     "mysql": "^2.13.0",
